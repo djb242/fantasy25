@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "saved_at": "2025-09-02T09:05:01",
-  "csv": "C:\\Users\\DJ\\Documents\\Fantasy 2025\\espn_projections_2025_season_no_zeros.csv",
+  "saved_at": "2025-09-02T12:41:39",
+  "csv": ".\\espn_projections_2025_season_no_zeros.csv",
   "teams": 10,
   "roster_slots": {
     "QB": 1,
@@ -25,7 +25,7 @@
     "bench": 0.4,
     "blocked": 0.1
   },
-  "top": 15,
+  "top": 25,
   "drafted": [
     {
       "act": "drafted",
@@ -541,6 +541,61 @@
       "act": "mine",
       "name": "Chase McLaughlin",
       "pos": "K"
+    },
+    {
+      "act": "drafted",
+      "name": "Jakobi Meyers",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Jake Bates",
+      "pos": "K"
+    },
+    {
+      "act": "drafted",
+      "name": "Jameson Williams",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Michael Pittman Jr.",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Josh Downs",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Drake Maye",
+      "pos": "QB"
+    },
+    {
+      "act": "drafted",
+      "name": "Justin Fields",
+      "pos": "QB"
+    },
+    {
+      "act": "drafted",
+      "name": "Dak Prescott",
+      "pos": "QB"
+    },
+    {
+      "act": "drafted",
+      "name": "Seahawks D/ST",
+      "pos": "DST"
+    },
+    {
+      "act": "drafted",
+      "name": "Tucker Kraft",
+      "pos": "TE"
+    },
+    {
+      "act": "drafted",
+      "name": "Rhamondre Stevenson",
+      "pos": "RB"
     }
   ],
   "my_counts": {

@@ -1,0 +1,21 @@
+﻿
+Key                         Value                                                                                      
+---                         -----                                                                                      
+Connection                  keep-alive                                                                                 
+access-control-allow-origin *                                                                                          
+content-security-policy     frame-ancestors  'self' asia.espn.com:* asia.espnqa.com:* *.espn.com:* *.espnqa.com:* *....
+vary                        Accept-Encoding                                                                            
+Accept-Ranges               bytes                                                                                      
+Content-Length              141561                                                                                     
+Cache-Control               max-age=0, must-revalidate                                                                 
+Content-Type                text/html;charset=UTF-8                                                                    
+Date                        Thu, 28 Aug 2025 15:32:21 GMT                                                              
+ETag                        W/"47bd6d90711ac17fca021576d84a4bc75cd7c49e"                                               
+Set-Cookie                  edition=espn-en-us; path=/; Expires=Thu, 04 Sep 2025 15:32:21 GMT;,country=us; path=/;,e...
+Via                         1.1 varnish (Varnish/6.0), 1.1 5773f2f43b989a9f02f459e75620d5f4.cloudfront.net (CloudFront)
+X-Cache                     Miss from cloudfront                                                                       
+X-Amz-Cf-Pop                JFK52-P1                                                                                   
+X-Amz-Cf-Id                 7lZ8EILS-8iAzKpPEmPFCjVdj50CM72au1TdzSbg3eGhQSU-Fo3aSw==                                   
+
+
+

@@ -1,0 +1,12 @@
+﻿Transfer-Encoding: chunked
+Connection: keep-alive
+X-Frame-Options: DENY
+vary: accept-encoding
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+X-Cache: Error from cloudfront
+X-Amz-Cf-Pop: BOS50-P1
+X-Amz-Cf-Id: DDX98GHcbpJrTrYRm_FPPfEncw4Goh9ohhoLkWsFffI3Q0yyovNiCA==
+Content-Type: application/json;charset=utf-8
+Date: Thu, 28 Aug 2025 16:06:03 GMT
+Via: 1.1 20807e7556b32e64ab1bd96f31464608.cloudfront.net (CloudFront)
