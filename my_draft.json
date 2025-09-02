@@ -1,0 +1,555 @@
+{
+  "version": 1,
+  "saved_at": "2025-09-02T09:05:01",
+  "csv": "C:\\Users\\DJ\\Documents\\Fantasy 2025\\espn_projections_2025_season_no_zeros.csv",
+  "teams": 10,
+  "roster_slots": {
+    "QB": 1,
+    "RB": 2,
+    "WR": 2,
+    "TE": 1,
+    "FLEX": 1,
+    "K": 1,
+    "DST": 1
+  },
+  "bench_slots": {
+    "QB": 0,
+    "RB": 0,
+    "WR": 0,
+    "TE": 0,
+    "K": 0,
+    "DST": 0
+  },
+  "weights": {
+    "need": 1.0,
+    "bench": 0.4,
+    "blocked": 0.1
+  },
+  "top": 15,
+  "drafted": [
+    {
+      "act": "drafted",
+      "name": "Ja'Marr Chase",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Bijan Robinson",
+      "pos": "RB"
+    },
+    {
+      "act": "mine",
+      "name": "Saquon Barkley",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Christian McCaffrey",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Jahmyr Gibbs",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Justin Jefferson",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "CeeDee Lamb",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Davante Adams",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Ashton Jeanty",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Nico Collins",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "De'Von Achane",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Amon-Ra St. Brown",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "DK Metcalf",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "D'Andre Swift",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Derrick Henry",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Puka Nacua",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Josh Jacobs",
+      "pos": "RB"
+    },
+    {
+      "act": "mine",
+      "name": "Brian Thomas Jr.",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Malik Nabers",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Jonathan Taylor",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Jalen Hurts",
+      "pos": "QB"
+    },
+    {
+      "act": "drafted",
+      "name": "A.J. Brown",
+      "pos": "WR"
+    },
+    {
+      "act": "mine",
+      "name": "Josh Allen",
+      "pos": "QB"
+    },
+    {
+      "act": "drafted",
+      "name": "Drake London",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Jayden Daniels",
+      "pos": "QB"
+    },
+    {
+      "act": "drafted",
+      "name": "Travis Hunter",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Chris Olave",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Rashid Shaheed",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Brock Bowers",
+      "pos": "TE"
+    },
+    {
+      "act": "drafted",
+      "name": "Chase Brown",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Trey McBride",
+      "pos": "TE"
+    },
+    {
+      "act": "drafted",
+      "name": "Bucky Irving",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Jalen Coker",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "James Cook",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Joe Burrow",
+      "pos": "QB"
+    },
+    {
+      "act": "drafted",
+      "name": "Tee Higgins",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Lamar Jackson",
+      "pos": "QB"
+    },
+    {
+      "act": "mine",
+      "name": "Kyren Williams",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Tyreek Hill",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "George Kittle",
+      "pos": "TE"
+    },
+    {
+      "act": "drafted",
+      "name": "Ladd McConkey",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "TreVeyon Henderson",
+      "pos": "RB"
+    },
+    {
+      "act": "mine",
+      "name": "Xavier Worthy",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Terry McLaurin",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Jaxon Smith-Njigba",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Alvin Kamara",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Patrick Mahomes",
+      "pos": "QB"
+    },
+    {
+      "act": "drafted",
+      "name": "Isiah Pacheco",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Garrett Wilson",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "James Conner",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Courtland Sutton",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Chuba Hubbard",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Rashee Rice",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Breece Hall",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Sam LaPorta",
+      "pos": "TE"
+    },
+    {
+      "act": "drafted",
+      "name": "Kenneth Walker III",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Omarion Hampton",
+      "pos": "RB"
+    },
+    {
+      "act": "mine",
+      "name": "Tony Pollard",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Cooper Kupp",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "David Montgomery",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Steelers D/ST",
+      "pos": "DST"
+    },
+    {
+      "act": "drafted",
+      "name": "Jalen Tolbert",
+      "pos": "WR"
+    },
+    {
+      "act": "mine",
+      "name": "T.J. Hockenson",
+      "pos": "TE"
+    },
+    {
+      "act": "drafted",
+      "name": "DJ Moore",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Travis Kelce",
+      "pos": "TE"
+    },
+    {
+      "act": "drafted",
+      "name": "Marvin Harrison Jr.",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Jaylen Waddle",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Jaxson Dart",
+      "pos": "QB"
+    },
+    {
+      "act": "drafted",
+      "name": "Baker Mayfield",
+      "pos": "QB"
+    },
+    {
+      "act": "drafted",
+      "name": "Mike Evans",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Calvin Ridley",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Zay Flowers",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Bryce Young",
+      "pos": "QB"
+    },
+    {
+      "act": "drafted",
+      "name": "David Njoku",
+      "pos": "TE"
+    },
+    {
+      "act": "drafted",
+      "name": "Broncos D/ST",
+      "pos": "DST"
+    },
+    {
+      "act": "drafted",
+      "name": "George Pickens",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Mark Andrews",
+      "pos": "TE"
+    },
+    {
+      "act": "mine",
+      "name": "Texans D/ST",
+      "pos": "DST"
+    },
+    {
+      "act": "drafted",
+      "name": "Darnell Mooney",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Jerry Jeudy",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Aaron Jones Sr.",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Christian Kirk",
+      "pos": "WR"
+    },
+    {
+      "act": "mine",
+      "name": "RJ Harvey",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Vikings D/ST",
+      "pos": "DST"
+    },
+    {
+      "act": "drafted",
+      "name": "Evan Engram",
+      "pos": "TE"
+    },
+    {
+      "act": "drafted",
+      "name": "Cam Skattebo",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "DeVonta Smith",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Ollie Gordon II",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Rome Odunze",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Bo Nix",
+      "pos": "QB"
+    },
+    {
+      "act": "drafted",
+      "name": "Jake Ferguson",
+      "pos": "TE"
+    },
+    {
+      "act": "drafted",
+      "name": "Tyler Warren",
+      "pos": "TE"
+    },
+    {
+      "act": "drafted",
+      "name": "Marvin Mims Jr.",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Jaylen Warren",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "J.J. McCarthy",
+      "pos": "QB"
+    },
+    {
+      "act": "drafted",
+      "name": "Matthew Golden",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Kyler Murray",
+      "pos": "QB"
+    },
+    {
+      "act": "mine",
+      "name": "Tyrone Tracy Jr.",
+      "pos": "RB"
+    },
+    {
+      "act": "drafted",
+      "name": "Lions D/ST",
+      "pos": "DST"
+    },
+    {
+      "act": "drafted",
+      "name": "Brock Purdy",
+      "pos": "QB"
+    },
+    {
+      "act": "drafted",
+      "name": "Tetairoa McMillan",
+      "pos": "WR"
+    },
+    {
+      "act": "drafted",
+      "name": "Dalton Kincaid",
+      "pos": "TE"
+    },
+    {
+      "act": "mine",
+      "name": "Chase McLaughlin",
+      "pos": "K"
+    }
+  ],
+  "my_counts": {
+    "RB": 4,
+    "WR": 2,
+    "QB": 1,
+    "FLEX": 1,
+    "TE": 1,
+    "DST": 1,
+    "K": 1
+  }
+}

@@ -1,0 +1,171 @@
+  help             Show this help
+  quit             Exit
+
+Tips:
+- Names are matched exactly. If not found, you'll get close suggestions.
+- Your roster capacity comes from --roster/--bench. FLEX accepts RB/WR/TE.
+- Weights (need/bench/blocked) affect where depth is taken; tune with --weights.
+"""
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--csv', required=True, help='Path to players CSV')
+    ap.add_argument('--teams', type=int, default=10, help='Number of teams in league (default 10)')
+    ap.add_argument('--roster', default="QB:1,RB:2,WR:2,TE:1,FLEX:1,K:1,DST:1",
+                    help='Starters per team, e.g., "QB:1,RB:2,WR:2,TE:1,FLEX:1,K:1,DST:1"')
+    ap.add_argument('--bench', default="QB:0,RB:0,WR:0,TE:0,K:0,DST:0",
+                    help='Bench capacity per position for YOUR team, e.g., "RB:2,WR:1"')
+    ap.add_argument('--weights', default="need:1.0,bench:0.4,blocked:0.1",
+                    help='Weights for need states, e.g., "need:1.0,bench:0.5,blocked:0.15"')
+    ap.add_argument('--top', type=int, default=15, help='How many players to show each update')
+    ap.add_argument('--col-player', default=None)
+    ap.add_argument('--col-pos', default=None)
+    ap.add_argument('--col-points', default=None)
+    args = ap.parse_args()
+
+    # Parse configs
+    roster_slots = parse_kv_list(args.roster, key_type=str, val_type=int)
+    bench_slots = parse_kv_list(args.bench, key_type=str, val_type=int)
+    # parse weights
+    w = {}
+    for frag in args.weights.split(","):
+        frag = frag.strip()
+        if not frag: continue
+        k,v = frag.split(":",1)
+        w[k.strip().lower()] = float(v.strip())
+    weights = {'need': w.get('need',1.0), 'bench': w.get('bench',0.4), 'blocked': w.get('blocked',0.1)}
+
+    try:
+        df = load_data(args)
+    except Exception as e:
+        print(f"ERROR: {e}")
+        sys.exit(1)
+
+    all_names = df['player'].tolist()
+    drafted = []   # order-sensitive for undo
+    drafted_set = set()
+    my_counts = defaultdict(int)  # counts per position, plus 'FLEX' we increment when used
+
+    print(f"Loaded {len(df)} players from {args.csv}. Teams={args.teams}. Roster={roster_slots}. Bench={bench_slots}.")
+    print(HELP_TEXT.strip())
+
+    if not recalc_and_show(df, drafted_set, my_counts, args.teams, roster_slots, bench_slots, weights, args.top):
+        return
+
+    while True:
+        try:
+            line = input("\n> ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print("\nExiting.")
+            break
+        if not line:
+            continue
+        low = line.lower()
+
+        if low in ('q','quit','exit'):
+            break
+        if low in ('h','help','?'):
+            print(HELP_TEXT.strip())
+            continue
+        if low == 'best':
+            recalc_and_show(df, drafted_set, my_counts, args.teams, roster_slots, bench_slots, weights, args.top)
+            continue
+        if low == 'status':
+            print("Your roster used: " + ", ".join([f"{k}:{v}" for k,v in sorted(my_counts.items())]))
+            print(f"Weights: {weights}")
+            # show need states
+            ns = compute_my_need_states(roster_slots, bench_slots, my_counts)
+            print("Need states: " + ", ".join([f"{k}:{ns[k]}" for k in BASE_POSITIONS]))
+            continue
+        if low == 'undo':
+            if not drafted:
+                print("Nothing to undo.")
+                continue
+            act, name, pos = drafted.pop()
+            if act == 'drafted':
+                if name in drafted_set:
+                    drafted_set.remove(name)
+                print(f"Undid drafted: {name}")
+            else:
+                print("Undo for 'mine' not yet implemented.")
+            continue
+        if low.startswith('save '):
+            path = line.split(None,1)[1]
+            avail = df[~df['player'].isin(drafted_set)].copy()
+            # compute scored table for saving
+            replacement_points = compute_replacement_points(avail, args.teams, roster_slots)
+            need_states = compute_my_need_states(roster_slots, bench_slots, my_counts)
+            scored = candidate_scores(avail, replacement_points, need_states, weights)
+            scored.to_csv(path, index=False)
+            print(f"Saved remaining pool with scores to {path}")
+            continue
+        if low.startswith('filter '):
+            pos = line.split(None,1)[1].strip().upper()
+            if pos in DEF_ALIASES:
+                pos = 'DST'
+            if pos not in BASE_POSITIONS:
+                print(f"Unknown position '{pos}'. Use one of {BASE_POSITIONS}.")
+                continue
+            avail = df[~df['player'].isin(drafted_set)].copy()
+            replacement_points = compute_replacement_points(avail, args.teams, roster_slots)
+            need_states = compute_my_need_states(roster_slots, bench_slots, my_counts)
+            scored = candidate_scores(avail, replacement_points, need_states, weights)
+            posdf = scored[scored['position']==pos].head(10)
+            if posdf.empty:
+                print(f"No players left at {pos}.")
+            else:
+                print(printable_table(posdf, topn=10))
+            continue
+
+        # "mine <name>"
+        if low.startswith('mine '):
+            name = line.split(None,1)[1].strip()
+            # exact first
+            if name not in all_names:
+                suggestions = get_close_matches(name, all_names, n=5, cutoff=0.6)
+                if suggestions:
+                    print(f"Name not found. Did you mean: {', '.join(suggestions)} ?")
+                    continue
+                else:
+                    print("Name not found. Check spelling.")
+                    continue
+            if name in drafted_set:
+                print(f"Already drafted: {name}")
+                continue
+            # get pos
+            pos = df[df['player']==name].iloc[0]['position']
+            drafted.append(('mine', name, pos))
+            drafted_set.add(name)
+            # increment my roster counts: prefer filling starters; if starters full and FLEX available for RB/WR/TE, consume FLEX; else bench.
+            pos_upper = pos.upper()
+            flex_accept = {'RB','WR','TE'}
+            starters = roster_slots.get(pos_upper, 0)
+            if my_counts[pos_upper] < starters:
+                my_counts[pos_upper] += 1
+            elif pos_upper in flex_accept and my_counts.get('FLEX',0) < roster_slots.get('FLEX',0):
+                my_counts['FLEX'] = my_counts.get('FLEX',0) + 1
+            else:
+                my_counts[pos_upper] += 1  # bench
+            recalc_and_show(df, drafted_set, my_counts, args.teams, roster_slots, bench_slots, weights, args.top)
+            continue
+
+        # otherwise treat as league drafted name
+        name = line.strip()
+        if name not in all_names:
+            suggestions = get_close_matches(name, all_names, n=5, cutoff=0.6)
+            if suggestions:
+                print(f"Name not found. Did you mean: {', '.join(suggestions)} ?")
+                continue
+            else:
+                print("Name not found. Check spelling.")
+                continue
+        if name in drafted_set:
+            print(f"Already drafted: {name}")
+            continue
+        pos = df[df['player']==name].iloc[0]['position']
+        drafted.append(('drafted', name, pos))
+        drafted_set.add(name)
+        recalc_and_show(df, drafted_set, my_counts, args.teams, roster_slots, bench_slots, weights, args.top)
+
+if __name__ == '__main__':
+    main()

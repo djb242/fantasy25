@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "saved_at": "2025-08-30T18:26:03",
+  "csv": "players.csv",
+  "teams": 10,
+  "roster_slots": {
+    "RB": 2
+  },
+  "bench_slots": {
+    "RB": 3
+  },
+  "weights": {
+    "need": 1.0,
+    "bench": 0.4,
+    "blocked": 0.1
+  },
+  "top": 15,
+  "drafted": [
+    {
+      "act": "drafted",
+      "name": "John Doe",
+      "pos": "RB"
+    },
+    {
+      "act": "mine",
+      "name": "My Guy",
+      "pos": "WR"
+    }
+  ],
+  "my_counts": {
+    "RB": 1,
+    "WR": 1,
+    "FLEX": 0
+  }
+}

@@ -6,6 +6,7 @@ Interactive fantasy draft helper using Value Over Replacement (VORP).
 - Tracks drafted players (any team) and your own picks separately.
 - Recomputes replacement levels by position as the league fills starters.
 - Scores candidates by VORP adjusted for your roster needs (need > bench > blocked).
+ - Also shows z_med: how many standard deviations a player's projected points are from the median at their position (computed on the remaining pool; population std used).
 
 USAGE (example):
   python draft_helper_step2_vorp.py --csv "/path/to/espn_projections_2025_season.csv" \
@@ -31,10 +32,14 @@ NOTES
     need_weight (default 1.0): you still have a starting slot to fill at that position (or a flex slot that can accept it).
     bench_weight (default 0.4): all your starters are filled but you have bench capacity.
     blocked_weight (default 0.1): no capacity left (starter+bench), still allow as depth.
+ - Persistence: pass --state PATH to auto-load and auto-save your multi-day draft progress.
 """
 
 import argparse
 import sys
+import os
+import json
+from datetime import datetime
 import pandas as pd
 from difflib import get_close_matches
 from collections import defaultdict
@@ -149,18 +154,28 @@ def candidate_scores(available_df, replacement_points, my_needs, weights):
     Compute VORP and adjust by my roster needs.
     my_needs: dict pos->state among {'need','bench','blocked'} giving how we should weight a position.
     weights: dict {'need':1.0, 'bench':0.4, 'blocked':0.1}
-    Returns a new DataFrame with columns: player, position, proj_points, vorp, adj_score, need_state
+    Returns a new DataFrame with columns: player, position, proj_points, vorp, z_med, adj_score, need_state
     """
+    # Per-position median and std for projected points (std measured around the median)
+    grp = available_df.groupby('position')['proj_points']
+    med_series = grp.median()
+    # Use population std (ddof=0); ensure no NaNs for singletons
+    std_series = grp.std(ddof=0).fillna(0.0)
+
     rows = []
     for r in available_df.itertuples(index=False):
         pos = r.position
         repl = replacement_points.get(pos, float('inf'))
         vorp = r.proj_points - repl
+        # z-score relative to the median for this position
+        med_val = float(med_series.get(pos, 0.0))
+        std_val = float(std_series.get(pos, 0.0))
+        z_med = (r.proj_points - med_val) / std_val if std_val > 0 else 0.0
         state = my_needs.get(pos, 'blocked')
         w = weights.get(state, 0.1)
         adj = vorp * w
-        rows.append((r.player, pos, r.proj_points, vorp, adj, state))
-    out = pd.DataFrame(rows, columns=['player','position','proj_points','vorp','adj_score','need_state'])
+        rows.append((r.player, pos, r.proj_points, vorp, z_med, adj, state))
+    out = pd.DataFrame(rows, columns=['player','position','proj_points','vorp','z_med','adj_score','need_state'])
     return out.sort_values(['adj_score','vorp','proj_points'], ascending=[False, False, False]).reset_index(drop=True)
 
 def compute_my_need_states(roster_slots, bench_slots, my_counts):
@@ -204,8 +219,41 @@ def printable_table(df, topn=15):
     show = df.head(topn).copy()
     show['proj_points'] = show['proj_points'].map(lambda x: f"{x:.2f}")
     show['vorp'] = show['vorp'].map(lambda x: f"{x:.2f}")
+    if 'z_med' in show.columns:
+        show['z_med'] = show['z_med'].map(lambda x: f"{x:.2f}")
     show['adj_score'] = show['adj_score'].map(lambda x: f"{x:.3f}")
-    return show[['player','position','proj_points','vorp','need_state','adj_score']].to_string(index=False)
+    cols = ['player','position','proj_points','vorp']
+    if 'z_med' in show.columns:
+        cols.append('z_med')
+    cols += ['need_state','adj_score']
+    return show[cols].to_string(index=False)
+
+def write_state(path, csv_path, teams, roster_slots, bench_slots, weights, topn, drafted, my_counts):
+    """
+    Persist the current draft state to JSON at 'path'.
+    """
+    data = {
+        'version': 1,
+        'saved_at': datetime.now().isoformat(timespec='seconds'),
+        'csv': csv_path,
+        'teams': teams,
+        'roster_slots': dict(roster_slots),
+        'bench_slots': dict(bench_slots),
+        'weights': dict(weights),
+        'top': topn,
+        'drafted': [{'act': a, 'name': n, 'pos': p} for (a,n,p) in drafted],
+        'my_counts': dict(my_counts),
+    }
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=2)
+
+def read_state(path):
+    """
+    Load draft state JSON from 'path'. Returns dict or raises.
+    """
+    with open(path, 'r', encoding='utf-8') as f:
+        return json.load(f)
 
 def recalc_and_show(df_all, drafted, my_counts, teams, roster_slots, bench_slots, weights, topn):
     available = df_all[~df_all['player'].isin(drafted)].copy().sort_values('proj_points', ascending=False)
@@ -248,6 +296,7 @@ Commands:
   best             Re-show the current best list
   filter POS       Show top 10 for a specific position (e.g., "filter TE")
   save PATH        Save remaining pool with VORP scores to CSV at PATH
+  save-state PATH  Save current draft progress (JSON) for later resume
   help             Show this help
   quit             Exit
 
@@ -255,6 +304,7 @@ Tips:
 - Names are matched exactly. If not found, you'll get close suggestions.
 - Your roster capacity comes from --roster/--bench. FLEX accepts RB/WR/TE.
 - Weights (need/bench/blocked) affect where depth is taken; tune with --weights.
+ - Use --state PATH to auto-load and auto-save multi-day draft progress; or 'save-state PATH' to save on demand.
 """
 
 def main():
@@ -271,6 +321,7 @@ def main():
     ap.add_argument('--col-player', default=None)
     ap.add_argument('--col-pos', default=None)
     ap.add_argument('--col-points', default=None)
+    ap.add_argument('--state', default=None, help='Path to draft state JSON for auto-load and auto-save')
     args = ap.parse_args()
 
     # Parse configs
@@ -296,6 +347,21 @@ def main():
     drafted_set = set()
     my_counts = defaultdict(int)  # counts per position, plus 'FLEX' we increment when used
 
+    # Load state if provided
+    if args.state and os.path.exists(args.state):
+        try:
+            st = read_state(args.state)
+            # basic sanity: warn if csv differs
+            if st.get('csv') and os.path.abspath(st.get('csv')) != os.path.abspath(args.csv):
+                print(f"WARNING: State CSV ({st.get('csv')}) differs from --csv ({args.csv}). Proceeding.")
+            # restore drafted and counts
+            drafted = [(d.get('act'), d.get('name'), d.get('pos')) for d in st.get('drafted', [])]
+            drafted_set = set([n for _, n, _ in drafted])
+            my_counts = defaultdict(int, st.get('my_counts', {}))
+            print(f"Loaded draft state from {args.state} with {len(drafted)} actions.")
+        except Exception as e:
+            print(f"WARNING: Failed to load state from {args.state}: {e}. Starting fresh.")
+
     print(f"Loaded {len(df)} players from {args.csv}. Teams={args.teams}. Roster={roster_slots}. Bench={bench_slots}.")
     print(HELP_TEXT.strip())
 
@@ -307,12 +373,24 @@ def main():
             line = input("\n> ").strip()
         except (EOFError, KeyboardInterrupt):
             print("\nExiting.")
+            if args.state:
+                try:
+                    write_state(args.state, args.csv, args.teams, roster_slots, bench_slots, weights, args.top, drafted, my_counts)
+                    print(f"Saved state to {args.state}")
+                except Exception as e:
+                    print(f"WARNING: Failed to save state: {e}")
             break
         if not line:
             continue
         low = line.lower()
 
         if low in ('q','quit','exit'):
+            if args.state:
+                try:
+                    write_state(args.state, args.csv, args.teams, roster_slots, bench_slots, weights, args.top, drafted, my_counts)
+                    print(f"Saved state to {args.state}")
+                except Exception as e:
+                    print(f"WARNING: Failed to save state: {e}")
             break
         if low in ('h','help','?'):
             print(HELP_TEXT.strip())
@@ -338,6 +416,12 @@ def main():
                 print(f"Undid drafted: {name}")
             else:
                 print("Undo for 'mine' not yet implemented.")
+            if args.state:
+                try:
+                    write_state(args.state, args.csv, args.teams, roster_slots, bench_slots, weights, args.top, drafted, my_counts)
+                    print(f"Saved state to {args.state}")
+                except Exception as e:
+                    print(f"WARNING: Failed to save state: {e}")
             continue
         if low.startswith('save '):
             path = line.split(None,1)[1]
@@ -348,6 +432,14 @@ def main():
             scored = candidate_scores(avail, replacement_points, need_states, weights)
             scored.to_csv(path, index=False)
             print(f"Saved remaining pool with scores to {path}")
+            continue
+        if low.startswith('save-state '):
+            path = line.split(None,1)[1]
+            try:
+                write_state(path, args.csv, args.teams, roster_slots, bench_slots, weights, args.top, drafted, my_counts)
+                print(f"Saved state to {path}")
+            except Exception as e:
+                print(f"ERROR: Failed to save state: {e}")
             continue
         if low.startswith('filter '):
             pos = line.split(None,1)[1].strip().upper()
@@ -397,6 +489,12 @@ def main():
             else:
                 my_counts[pos_upper] += 1  # bench
             recalc_and_show(df, drafted_set, my_counts, args.teams, roster_slots, bench_slots, weights, args.top)
+            if args.state:
+                try:
+                    write_state(args.state, args.csv, args.teams, roster_slots, bench_slots, weights, args.top, drafted, my_counts)
+                    print(f"Saved state to {args.state}")
+                except Exception as e:
+                    print(f"WARNING: Failed to save state: {e}")
             continue
 
         # otherwise treat as league drafted name
@@ -416,6 +514,12 @@ def main():
         drafted.append(('drafted', name, pos))
         drafted_set.add(name)
         recalc_and_show(df, drafted_set, my_counts, args.teams, roster_slots, bench_slots, weights, args.top)
+        if args.state:
+            try:
+                write_state(args.state, args.csv, args.teams, roster_slots, bench_slots, weights, args.top, drafted, my_counts)
+                print(f"Saved state to {args.state}")
+            except Exception as e:
+                print(f"WARNING: Failed to save state: {e}")
 
 if __name__ == '__main__':
     main()
